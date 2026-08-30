@@ -18,6 +18,7 @@ offline provider so the whole thing runs with no credentials.
 |---|---|
 | [The one idea](#the-one-idea-worth-taking-from-this) | Why the model is not the workflow |
 | [Measured results](#measured-results) | Gemini vs a keyword baseline, with sample sizes |
+| [Architecture at a glance](#architecture-at-a-glance) | The production design in one diagram |
 | [What it is worth](#what-it-is-worth) | The business case, and when not to build this |
 | [Run it](#run-it) | Locally, in Docker, or against live Gemini |
 | [How each requirement was addressed](#how-each-requirement-was-addressed) | The nine evaluation points, mapped to files |
@@ -85,6 +86,46 @@ correctly went red, and it exposed a real bug: the API replied `retryDelay:
 30s` while the backoff capped at 8s, so all three retries were guaranteed to
 fail. Fixed, and covered by tests. Details in
 [docs/EVALUATION.md](docs/EVALUATION.md).
+
+---
+
+## Architecture at a glance
+
+How this runs in production at thousands of incidents a day. Every element the brief asks about is one box — data in, the trigger, where Gemini sits, where results land, what happens to failures, and where the human fits.
+
+```mermaid
+flowchart LR
+    A["<b>Incidents arrive</b><br/>email · ITSM · alerts · form"]
+    B(["<b>Pub/Sub</b><br/>buffers the burst"])
+    C["<b>Cloud Run</b><br/>validate · redact · ground · route"]
+    D["<b>Vertex AI</b><br/>Gemini"]
+    E{"<b>Confident<br/>and safe?</b>"}
+    F["<b>ITSM ticket</b><br/>auto-triaged"]
+    G["<b>Review queue</b><br/>a person confirms"]
+    H(["<b>Dead letter</b><br/>never dropped"])
+    I[("<b>BigQuery</b><br/>every result")]
+    J["<b>Monitoring</b><br/>+ nightly evaluation"]
+
+    A --> B --> C
+    C <--> D
+    C --> E
+    E -->|yes| F
+    E -->|no| G
+    G --> F
+    C -.->|"call failed"| H
+    H --> G
+    C --> I --> J
+    G --> I
+
+    classDef gemini fill:#1a73e8,stroke:#4a9eff,color:#fff
+    classDef store fill:#0d652d,stroke:#35c48a,color:#fff
+    classDef human fill:#8a5a00,stroke:#f0b429,color:#fff
+    class D gemini
+    class I,B store
+    class G human
+```
+
+Full design, service choices and the alternatives rejected: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ---
 
