@@ -15,6 +15,57 @@ datacentre is on fire has failed at the only moment that mattered.
 
 ## Diagram
 
+The whole system in one view. Every element the brief asks about is one box:
+data enters top left, Pub/Sub triggers processing, Gemini is called from the
+worker, the gate decides whether a human is needed, results land in BigQuery,
+failures dead-letter to a person rather than disappearing, and monitoring reads
+from the results table.
+
+```mermaid
+flowchart LR
+    A["<b>Incidents arrive</b><br/>email · ITSM · alerts · form"]
+    B(["<b>Pub/Sub</b><br/>buffers the burst"])
+    C["<b>Cloud Run</b><br/>validate · redact · ground · route"]
+    D["<b>Vertex AI</b><br/>Gemini"]
+    E{"<b>Confident<br/>and safe?</b>"}
+    F["<b>ITSM ticket</b><br/>auto-triaged"]
+    G["<b>Review queue</b><br/>a person confirms"]
+    H(["<b>Dead letter</b><br/>never dropped"])
+    I[("<b>BigQuery</b><br/>every result")]
+    J["<b>Monitoring</b><br/>+ nightly evaluation"]
+
+    A --> B --> C
+    C <--> D
+    C --> E
+    E -->|yes| F
+    E -->|no| G
+    G --> F
+    C -.->|"call failed"| H
+    H --> G
+    C --> I --> J
+    G --> I
+
+    classDef gemini fill:#1a73e8,stroke:#4a9eff,color:#fff
+    classDef store fill:#0d652d,stroke:#35c48a,color:#fff
+    classDef human fill:#8a5a00,stroke:#f0b429,color:#fff
+    class D gemini
+    class I,B store
+    class G human
+```
+
+| The brief asks | Box |
+|---|---|
+| How data enters | **A** — email, ITSM webhook, monitoring alerts, web form |
+| How processing is triggered | **B** — Pub/Sub push subscription |
+| Where Gemini is used | **D** — Vertex AI, called only from the worker |
+| Where it is stored | **I** — BigQuery (plus GCS for raw text, Firestore for queue state) |
+| Where outputs are stored | **F** and **I** |
+| How failures are handled | **H** — dead-letter queue routed to a human |
+| How it is monitored | **J** — Cloud Monitoring and a nightly evaluation job |
+| Where human review fits | **G** — a designed-in stage, not an exception path |
+
+### The same thing in detail
+
 ```mermaid
 flowchart TB
     subgraph ingest["1 · Ingestion"]
@@ -44,7 +95,7 @@ flowchart TB
     subgraph process["3 · Processing"]
         CR["Cloud Run: triage-worker<br/><i>push subscription,<br/>concurrency 40, max 20 inst</i>"]
         VAL["validate → redact<br/><i>PII never leaves here</i>"]
-        GEM["Vertex AI<br/><b>Gemini 2.0 Flash</b><br/><i>response_schema</i>"]
+        GEM["Vertex AI<br/><b>Gemini Flash</b><br/><i>response_schema</i>"]
         GATE["ground → route<br/><i>deterministic rules</i>"]
     end
 
