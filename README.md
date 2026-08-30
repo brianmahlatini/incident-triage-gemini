@@ -12,6 +12,20 @@ Python + FastAPI backend, React + TypeScript console, Gemini via the
 `google-genai` SDK (Vertex AI or the Developer API), with a deterministic
 offline provider so the whole thing runs with no credentials.
 
+**Contents**
+
+| | |
+|---|---|
+| [The one idea](#the-one-idea-worth-taking-from-this) | Why the model is not the workflow |
+| [Measured results](#measured-results) | Gemini vs a keyword baseline, with sample sizes |
+| [What it is worth](#what-it-is-worth) | The business case, and when not to build this |
+| [Run it](#run-it) | Locally, in Docker, or against live Gemini |
+| [How each requirement was addressed](#how-each-requirement-was-addressed) | The nine evaluation points, mapped to files |
+| [Scope and what I would cut](#scope-and-what-i-would-cut) | Time spent, and the trade-off named |
+| [Honest limitations](#honest-limitations) | What this does not yet prove |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | GCP production design, diagram, alternatives rejected |
+| [docs/EVALUATION.md](docs/EVALUATION.md) | What "good" means and how it is measured |
+
 ---
 
 ## The one idea worth taking from this
@@ -71,6 +85,52 @@ correctly went red, and it exposed a real bug: the API replied `retryDelay:
 30s` while the backoff capped at 8s, so all three retries were guaranteed to
 fail. Fixed, and covered by tests. Details in
 [docs/EVALUATION.md](docs/EVALUATION.md).
+
+---
+
+## What it is worth
+
+The cost side is easy and small: **~$50/month** at 5,000 incidents/day, of
+which the model is about half (measured at ~$0.00016 per incident). Working
+through what that buys is more useful than the number itself.
+
+**The value is not headcount.** At a conservative two minutes to read,
+categorise and route a report, 5,000 a day is roughly **165 hours of reading
+per day**. It would be dishonest to present that as the saving — nobody
+removes twenty people because a classifier appeared, and a system that needs a
+human on ~70% of incidents is not trying to. The return is in three narrower
+places:
+
+1. **The auto-triaged share never waits.** Those tickets reach the right queue
+   in seconds instead of sitting until someone opens the mailbox. On a P1 at
+   03:00 that difference is the entire value of the system. Measured
+   automation rate here is **11–20%**, but read that with care: the evaluation
+   set deliberately over-represents ambiguous, adversarial and
+   security-adjacent reports, so it is close to a worst case. What a real
+   incident stream produces is one of the first things I would measure, and
+   the threshold is tunable against it.
+2. **The reviewed share arrives pre-digested.** The rest still reach a person,
+   but with a summary, a proposed category and priority, quoted evidence and a
+   named reason for the referral. Confirming a proposal takes a fraction of
+   the time of triaging from scratch — and because that is the *majority* of
+   the volume, it is where most of the saving actually sits, not in the
+   automated slice.
+3. **Consistency.** The same report gets the same priority on a Tuesday
+   morning and at the end of a night shift. Priority rubrics drift when tired
+   people apply them; that drift is invisible and expensive.
+
+**The metric that tracks the business case is `automation_rate`**, which is
+why the evaluation harness treats it as a release gate rather than a
+statistic. Accuracy with a 0% automation rate is a system that costs money and
+delivers nothing; the harness fails a run that drops below 15% for exactly
+that reason.
+
+**When I would not build this.** At 50 incidents a day the arithmetic
+collapses — two hours of reading, no queue, and a person who already knows the
+estate will out-perform any classifier. This design earns its keep on volume,
+on out-of-hours coverage, and where inconsistent prioritisation is already
+causing harm. If none of those three apply, the honest recommendation is a
+better intake form.
 
 ---
 
@@ -372,6 +432,38 @@ Dockerfile          two-stage build: Node compiles the console, Python serves it
 cloudbuild.yaml     test -> evaluate -> build -> deploy to Cloud Run
 .github/workflows/  CI: backend, frontend, and a container smoke test
 ```
+
+---
+
+## Scope, and what I would cut
+
+The brief asked for no more than 2.5 hours and said it was not looking for a
+polished product. This repo is past that, and it is worth being straight about
+which parts are which.
+
+**The answer to the brief** is the pipeline and the thinking around it: the
+schema contract, the prompt, validation, redaction, grounding, the routing
+rules, the error handling, the backend tests, the evaluation harness, and the
+two written documents. That is the part I would defend as necessary.
+
+**Everything after that was me seeing how far the tooling would go** —
+the React console, Docker, Cloud Build, GitHub Actions, the frontend tests.
+Most of it was written with AI assistance, which is the honest reason there is
+more here than a 2.5-hour budget normally produces, and the brief did say it
+was interested in how I use those tools.
+
+**Under a hard limit, the cut order would be:** the React console first (a CLI
+demonstrates the same workflow and the console is the single largest piece of
+non-essential code), then the container and CI configuration (valuable in a
+real engagement, not evidence of anything the brief asked about), then the
+frontend tests, which only exist because the console does.
+
+**What I would not cut, at any budget:** the evaluation harness and the
+routing rules. Without the harness there is no way to answer "is this good
+enough", which is a third of the brief. Without the routing rules the system
+is a classifier that occasionally sends a security incident to the printer
+queue with high confidence. Those two are the difference between a demo and
+something you could put in front of an operations team.
 
 ---
 
