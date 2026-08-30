@@ -1,0 +1,18 @@
+# Local convenience wrapper. `docker compose up` builds and serves the whole
+# application - API and console - on http://localhost:8000.
+services:
+  triage:
+    build: .
+    ports:
+      - "8000:8080"
+    environment:
+      # Defaults to the offline provider so the stack runs with no credentials.
+      # Switch to live Gemini by exporting these before `docker compose up`.
+      TRIAGE_PROVIDER: ${TRIAGE_PROVIDER:-mock}
+      TRIAGE_MODEL: ${TRIAGE_MODEL:-gemini-3.5-flash}
+      TRIAGE_CONFIDENCE_THRESHOLD: ${TRIAGE_CONFIDENCE_THRESHOLD:-0.70}
+      TRIAGE_LOG_LEVEL: ${TRIAGE_LOG_LEVEL:-INFO}
+      # Passed through from the host environment rather than written into any
+      # file, so a key never lands in the image or in version control.
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+    restart: unless-stopped

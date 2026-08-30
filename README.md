@@ -113,6 +113,47 @@ queue** (the human-in-the-loop step — accept or override, and the decision is
 recorded as an evaluation label), and **Metrics** (throughput, review rate, p95
 latency, cost, and why incidents were sent to humans).
 
+### Docker
+
+One command builds the console and the API together and serves both:
+
+```bash
+docker compose up --build          # http://localhost:8000
+
+# or plain docker
+docker build -t incident-triage .
+docker run -p 8000:8080 incident-triage
+```
+
+The image is a two-stage build: Node compiles the React console and is then
+discarded, so the 298 MB runtime carries Python and the built static files
+only. It runs as a non-root user, binds to `$PORT` (Cloud Run does not always
+supply 8080), and has a health check.
+
+To run the container against live Gemini, pass the key through from your
+environment rather than baking it into a file:
+
+```bash
+GOOGLE_API_KEY=... TRIAGE_PROVIDER=gemini docker compose up --build
+```
+
+### Deploying to Cloud Run
+
+[`cloudbuild.yaml`](cloudbuild.yaml) runs tests, then the evaluation gates,
+then builds and deploys — in that order, and a non-zero exit from either check
+fails the build. **A prompt change that degrades quality cannot ship**, which
+is the reason `run_eval.py` returns an exit code rather than only printing a
+report.
+
+```bash
+gcloud builds submit --config cloudbuild.yaml \
+  --substitutions=_REGION=europe-west1,_SERVICE=triage-worker
+```
+
+The deploy step uses Vertex AI rather than an API key, a dedicated service
+account rather than the default compute one, concurrency 40 (the work is
+almost all waiting on the model), and no public ingress.
+
 ### Switching to live Gemini
 
 ```bash
@@ -293,6 +334,8 @@ frontend/src/       React + TypeScript console
 eval/               labelled dataset and evaluation harness
 tests/              99 tests
 docs/               architecture and evaluation write-ups
+Dockerfile          two-stage build: Node compiles the console, Python serves it
+cloudbuild.yaml     test -> evaluate -> build -> deploy to Cloud Run
 ```
 
 ---

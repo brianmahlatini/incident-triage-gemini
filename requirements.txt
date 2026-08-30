@@ -1,5 +1,8 @@
 # --- core workflow ---
-pydantic==2.9.2
+# >=2.12.5 is required by google-genai 2.20.0. The pinned pair is verified
+# together by the Docker build, which resolves from scratch rather than
+# inheriting whatever a long-lived local venv happens to hold.
+pydantic==2.13.5
 python-dotenv==1.0.1
 
 # --- Gemini (Developer API + Vertex AI use the same SDK) ---

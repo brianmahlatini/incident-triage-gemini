@@ -1,0 +1,28 @@
+# Keep the build context small and free of anything secret. Every file listed
+# here would otherwise be uploaded to the daemon (and to Cloud Build) on every
+# build, and .env in particular must never reach an image layer.
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.git/
+.gitignore
+
+# node_modules and dist are rebuilt inside the frontend stage; copying the host
+# copies in would both bloat the context and risk baking in a stale build.
+frontend/node_modules/
+frontend/dist/
+frontend/.tsbuild/
+*.tsbuildinfo
+
+docs/
+tests/
+eval/results/
+*.md
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml

@@ -1,0 +1,112 @@
+# Cloud Build pipeline: test, evaluate, build, deploy.
+#
+# The ordering is the point. Tests and the evaluation harness run *before* the
+# image is built, and both fail the build on a non-zero exit. A prompt change
+# that degrades quality is caught here rather than in production, which is the
+# whole reason the evaluation harness returns an exit code instead of just
+# printing a report.
+#
+# Deploy with:
+#   gcloud builds submit --config cloudbuild.yaml \
+#     --substitutions=_REGION=europe-west1,_SERVICE=triage-worker
+
+substitutions:
+  _REGION: europe-west1
+  _SERVICE: incident-triage
+  _REPO: containers
+  _MODEL: gemini-3.5-flash
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}:${SHORT_SHA}
+
+steps:
+  # --- 1. Unit tests -------------------------------------------------------
+  # No network, no credentials, a couple of seconds. Fails fast and cheaply.
+  - id: test
+    name: python:3.11-slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        pytest -q
+
+  # --- 2. Evaluation gates -------------------------------------------------
+  # Runs against the offline baseline provider so the build stays hermetic and
+  # free. A scheduled Cloud Run Job runs the same harness against live Gemini
+  # nightly - a per-commit live run would be slow, costly and rate-limited, and
+  # would make build success depend on a third party's availability.
+  - id: evaluate
+    name: python:3.11-slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        python eval/run_eval.py --out /workspace/eval-report.json || {
+          echo "Evaluation gates failed - not shipping this change."
+          exit 1
+        }
+    waitFor: ["test"]
+
+  # --- 3. Build ------------------------------------------------------------
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}:${SHORT_SHA}
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}:latest
+      - .
+    waitFor: ["evaluate"]
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "--all-tags", "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}"]
+    waitFor: ["build"]
+
+  # --- 4. Deploy -----------------------------------------------------------
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      # Deployed as a dedicated service account, not the default compute one,
+      # so the service holds only the roles it needs: Vertex AI user, and write
+      # access to its own Firestore and BigQuery targets.
+      - --service-account=triage-worker@${PROJECT_ID}.iam.gserviceaccount.com
+      # Vertex AI rather than an API key: IAM instead of a shared secret, plus
+      # VPC-SC, CMEK and regional data residency.
+      - --set-env-vars=TRIAGE_PROVIDER=gemini,TRIAGE_MODEL=${_MODEL},GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${_REGION}
+      # Concurrency 40: the work is almost entirely waiting on the model API,
+      # so one instance serves many in-flight requests. Leaving this at 1 would
+      # multiply the instance count, and the bill, for no gain.
+      - --concurrency=40
+      - --cpu=1
+      - --memory=1Gi
+      - --min-instances=0
+      - --max-instances=20
+      # Generous relative to the ~15s observed per incident, because a retry
+      # with a server-supplied backoff hint can legitimately take longer.
+      - --timeout=120s
+      # No public ingress: the service is reached by Pub/Sub push with an OIDC
+      # token, and the console sits behind IAP.
+      - --no-allow-unauthenticated
+    waitFor: ["push"]
+
+artifacts:
+  objects:
+    location: gs://${PROJECT_ID}-build-artifacts/eval/
+    paths: ["/workspace/eval-report.json"]
+
+timeout: 1200s
