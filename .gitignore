@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+.ruff_cache/
+node_modules/
+frontend/dist/
+*.log
+frontend/.tsbuild/
+*.tsbuildinfo

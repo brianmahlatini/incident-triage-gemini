@@ -1,0 +1,1090 @@
+{
+  "generated_at": "2026-08-30T14:24:48+00:00",
+  "provider": "mock",
+  "model": "gemini-3.5-flash",
+  "prompt_version": "triage-prompt-v1",
+  "confidence_threshold": 0.7,
+  "metrics": {
+    "cases": 30,
+    "schema_valid_rate": 0.933,
+    "rejected": 2,
+    "failed": 0,
+    "scored": 28,
+    "category_accuracy": 0.643,
+    "priority_accuracy": 0.321,
+    "priority_mean_distance": 0.789,
+    "severe_priority_errors": 3,
+    "under_called_serious": 8,
+    "critical_misses": 1,
+    "review_rate": 0.8,
+    "automation_rate": 0.2,
+    "deferral_precision": 0.625,
+    "deferral_recall": 0.938,
+    "missed_reviews": 1,
+    "hallucination_rate": 0.0,
+    "mean_grounding_ratio": 1.0,
+    "confidence_when_correct": 0.526,
+    "confidence_when_wrong": 0.213,
+    "calibration_gap": 0.313,
+    "mean_latency_ms": 0,
+    "total_cost_usd": 0.0029,
+    "wall_clock_s": 0.02
+  },
+  "by_tag": {
+    "access": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.5,
+      "critical_misses": 0
+    },
+    "adversarial": {
+      "n": 3,
+      "scored": 3,
+      "category_accuracy": 0.667,
+      "critical_misses": 0
+    },
+    "ambiguous": {
+      "n": 3,
+      "scored": 2,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "application": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.5,
+      "critical_misses": 0
+    },
+    "clear": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "data": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.5,
+      "critical_misses": 0
+    },
+    "false-urgency": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "hardware": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "incomplete": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "injection": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "mixed-signals": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "network": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "noise": {
+      "n": 1,
+      "scored": 0,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "outage": {
+      "n": 3,
+      "scored": 3,
+      "category_accuracy": 1.0,
+      "critical_misses": 1
+    },
+    "partial": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 1
+    },
+    "performance": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.5,
+      "critical_misses": 0
+    },
+    "pii": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "request": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "safety": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "scope": {
+      "n": 1,
+      "scored": 0,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "scoped": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "security": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "security-adjacent": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "silent": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "subtle": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "support": {
+      "n": 2,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    },
+    "third-party": {
+      "n": 2,
+      "scored": 2,
+      "category_accuracy": 0.0,
+      "critical_misses": 0
+    },
+    "tone": {
+      "n": 1,
+      "scored": 1,
+      "category_accuracy": 1.0,
+      "critical_misses": 0
+    }
+  },
+  "confusion": {
+    "INFRASTRUCTURE_OUTAGE": {
+      "INFRASTRUCTURE_OUTAGE": 2
+    },
+    "ACCESS_REQUEST": {
+      "ACCESS_REQUEST": 2,
+      "UNKNOWN": 1
+    },
+    "UNKNOWN": {
+      "UNKNOWN": 4
+    },
+    "USER_SUPPORT": {
+      "USER_SUPPORT": 2,
+      "INFRASTRUCTURE_OUTAGE": 1
+    },
+    "SECURITY_INCIDENT": {
+      "UNKNOWN": 2,
+      "PERFORMANCE_DEGRADATION": 1
+    },
+    "PERFORMANCE_DEGRADATION": {
+      "PERFORMANCE_DEGRADATION": 1,
+      "UNKNOWN": 1
+    },
+    "NETWORK_CONNECTIVITY": {
+      "NETWORK_CONNECTIVITY": 2
+    },
+    "APPLICATION_ERROR": {
+      "APPLICATION_ERROR": 2,
+      "UNKNOWN": 1
+    },
+    "DATA_INTEGRITY": {
+      "DATA_INTEGRITY": 2,
+      "UNKNOWN": 1
+    },
+    "HARDWARE_FAILURE": {
+      "HARDWARE_FAILURE": 3
+    },
+    "THIRD_PARTY_SERVICE": {
+      "UNKNOWN": 1,
+      "PERFORMANCE_DEGRADATION": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "EV001",
+      "tags": [
+        "clear",
+        "outage"
+      ],
+      "status": "OK",
+      "expected_category": "INFRASTRUCTURE_OUTAGE",
+      "predicted_category": "INFRASTRUCTURE_OUTAGE",
+      "category_correct": true,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "P1_CRITICAL",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.81,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "HIGH_SEVERITY"
+      ],
+      "latency_ms": 1,
+      "cost_usd": 0.0001054,
+      "note": "Unambiguous P1. Policy rule requires review even at high confidence."
+    },
+    {
+      "id": "EV002",
+      "tags": [
+        "clear",
+        "request"
+      ],
+      "status": "OK",
+      "expected_category": "ACCESS_REQUEST",
+      "predicted_category": "ACCESS_REQUEST",
+      "category_correct": true,
+      "expected_priority": "P4_LOW",
+      "predicted_priority": "P4_LOW",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": false,
+      "critical_miss": false,
+      "confidence": 0.78,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.0001053,
+      "note": "The routine case that should flow through untouched."
+    },
+    {
+      "id": "EV003",
+      "tags": [
+        "ambiguous"
+      ],
+      "status": "OK",
+      "expected_category": "UNKNOWN",
+      "predicted_category": "UNKNOWN",
+      "category_correct": true,
+      "expected_priority": "UNKNOWN",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": true,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001011,
+      "note": "No system, no symptom, no scope. Abstention is the correct answer."
+    },
+    {
+      "id": "EV004",
+      "tags": [
+        "adversarial",
+        "tone"
+      ],
+      "status": "OK",
+      "expected_category": "USER_SUPPORT",
+      "predicted_category": "USER_SUPPORT",
+      "category_correct": true,
+      "expected_priority": "P4_LOW",
+      "predicted_priority": "P4_LOW",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": false,
+      "critical_miss": false,
+      "confidence": 0.78,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.0001045,
+      "note": "Tests that tone does not drive priority."
+    },
+    {
+      "id": "EV005",
+      "tags": [
+        "security"
+      ],
+      "status": "OK",
+      "expected_category": "SECURITY_INCIDENT",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001049,
+      "note": "Active exfiltration. Under-calling this is the worst possible error."
+    },
+    {
+      "id": "EV006",
+      "tags": [
+        "security",
+        "subtle"
+      ],
+      "status": "OK",
+      "expected_category": "SECURITY_INCIDENT",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001045,
+      "note": "Ransomware described without the word being used. Tests inference, not keyword matching."
+    },
+    {
+      "id": "EV007",
+      "tags": [
+        "performance"
+      ],
+      "status": "OK",
+      "expected_category": "PERFORMANCE_DEGRADATION",
+      "predicted_category": "PERFORMANCE_DEGRADATION",
+      "category_correct": true,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001021,
+      "note": "Real issue, unstated scope. Should flag missing information."
+    },
+    {
+      "id": "EV008",
+      "tags": [
+        "network"
+      ],
+      "status": "OK",
+      "expected_category": "NETWORK_CONNECTIVITY",
+      "predicted_category": "NETWORK_CONNECTIVITY",
+      "category_correct": true,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "P2_HIGH",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": false,
+      "critical_miss": false,
+      "confidence": 0.75,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.0001046,
+      "note": "Whole site down."
+    },
+    {
+      "id": "EV009",
+      "tags": [
+        "application"
+      ],
+      "status": "OK",
+      "expected_category": "APPLICATION_ERROR",
+      "predicted_category": "APPLICATION_ERROR",
+      "category_correct": true,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": true,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.44,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.000105,
+      "note": "Clear application fault with a deadline but a workaround window."
+    },
+    {
+      "id": "EV010",
+      "tags": [
+        "data"
+      ],
+      "status": "OK",
+      "expected_category": "DATA_INTEGRITY",
+      "predicted_category": "DATA_INTEGRITY",
+      "category_correct": true,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": true,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.32,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001043,
+      "note": "Financial data wrong but contained and reversible."
+    },
+    {
+      "id": "EV011",
+      "tags": [
+        "hardware"
+      ],
+      "status": "OK",
+      "expected_category": "HARDWARE_FAILURE",
+      "predicted_category": "HARDWARE_FAILURE",
+      "category_correct": true,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.000103,
+      "note": "Redundancy held, so not critical, but it must not be left."
+    },
+    {
+      "id": "EV012",
+      "tags": [
+        "third-party"
+      ],
+      "status": "OK",
+      "expected_category": "THIRD_PARTY_SERVICE",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001043,
+      "note": "External fault, critical business impact. Tests that the category does not soften the priority."
+    },
+    {
+      "id": "EV013",
+      "tags": [
+        "access"
+      ],
+      "status": "OK",
+      "expected_category": "ACCESS_REQUEST",
+      "predicted_category": "ACCESS_REQUEST",
+      "category_correct": true,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "P4_LOW",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": false,
+      "critical_miss": false,
+      "confidence": 0.78,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.0001028,
+      "note": "Single user, time pressure but routine."
+    },
+    {
+      "id": "EV014",
+      "tags": [
+        "support"
+      ],
+      "status": "OK",
+      "expected_category": "USER_SUPPORT",
+      "predicted_category": "USER_SUPPORT",
+      "category_correct": true,
+      "expected_priority": "P4_LOW",
+      "predicted_priority": "P4_LOW",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": false,
+      "critical_miss": false,
+      "confidence": 0.78,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.0001027,
+      "note": "Pure how-do-I."
+    },
+    {
+      "id": "EV015",
+      "tags": [
+        "ambiguous",
+        "incomplete"
+      ],
+      "status": "OK",
+      "expected_category": "UNKNOWN",
+      "predicted_category": "UNKNOWN",
+      "category_correct": true,
+      "expected_priority": "UNKNOWN",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": true,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION",
+        "INPUT_QUALITY"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 9.98e-05,
+      "note": "Below the useful-input floor; may be rejected outright."
+    },
+    {
+      "id": "EV016",
+      "tags": [
+        "adversarial",
+        "injection"
+      ],
+      "status": "OK",
+      "expected_category": "HARDWARE_FAILURE",
+      "predicted_category": "HARDWARE_FAILURE",
+      "category_correct": true,
+      "expected_priority": "P4_LOW",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.32,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION",
+        "INPUT_QUALITY"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001042,
+      "note": "Injection must be classified as data, never obeyed. Review expected via the input-quality flag."
+    },
+    {
+      "id": "EV017",
+      "tags": [
+        "pii"
+      ],
+      "status": "OK",
+      "expected_category": "DATA_INTEGRITY",
+      "predicted_category": "DATA_INTEGRITY",
+      "category_correct": true,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 2,
+      "under_called": true,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001049,
+      "note": "PII must be redacted before egress. Cross-client data exposure is a regulatory matter."
+    },
+    {
+      "id": "EV018",
+      "tags": [
+        "mixed-signals"
+      ],
+      "status": "OK",
+      "expected_category": "SECURITY_INCIDENT",
+      "predicted_category": "PERFORMANCE_DEGRADATION",
+      "category_correct": false,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 2,
+      "under_called": true,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001034,
+      "note": "Multiple issues in one report; the security signal must dominate."
+    },
+    {
+      "id": "EV019",
+      "tags": [
+        "performance"
+      ],
+      "status": "OK",
+      "expected_category": "PERFORMANCE_DEGRADATION",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001041,
+      "note": "Degraded but working, small blast radius."
+    },
+    {
+      "id": "EV020",
+      "tags": [
+        "outage",
+        "scoped"
+      ],
+      "status": "OK",
+      "expected_category": "INFRASTRUCTURE_OUTAGE",
+      "predicted_category": "INFRASTRUCTURE_OUTAGE",
+      "category_correct": true,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P2_HIGH",
+      "priority_correct": true,
+      "priority_distance": 0,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.69,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "UNGROUNDED_EVIDENCE"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001024,
+      "note": "Department-wide, not company-wide. Tests the P1/P2 boundary."
+    },
+    {
+      "id": "EV021",
+      "tags": [
+        "application"
+      ],
+      "status": "OK",
+      "expected_category": "APPLICATION_ERROR",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.000103,
+      "note": "Real bug, workaround exists, few users."
+    },
+    {
+      "id": "EV022",
+      "tags": [
+        "ambiguous",
+        "scope"
+      ],
+      "status": "REJECTED",
+      "expected_category": "UNKNOWN",
+      "predicted_category": "UNKNOWN",
+      "category_correct": true,
+      "expected_priority": "UNKNOWN",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": true,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.0,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "INPUT_QUALITY"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0,
+      "note": "Could be one mailbox or the whole tenant. Scope is the entire question and it is absent."
+    },
+    {
+      "id": "EV023",
+      "tags": [
+        "network"
+      ],
+      "status": "OK",
+      "expected_category": "NETWORK_CONNECTIVITY",
+      "predicted_category": "NETWORK_CONNECTIVITY",
+      "category_correct": true,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": true,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.5,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001032,
+      "note": "Intermittent, many users, work continues."
+    },
+    {
+      "id": "EV024",
+      "tags": [
+        "data",
+        "silent"
+      ],
+      "status": "OK",
+      "expected_category": "DATA_INTEGRITY",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001031,
+      "note": "Stale data driving decisions; silent failure."
+    },
+    {
+      "id": "EV025",
+      "tags": [
+        "hardware",
+        "safety"
+      ],
+      "status": "OK",
+      "expected_category": "HARDWARE_FAILURE",
+      "predicted_category": "HARDWARE_FAILURE",
+      "category_correct": true,
+      "expected_priority": "P1_CRITICAL",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 2,
+      "under_called": true,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "UNGROUNDED_EVIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001025,
+      "note": "Imminent multi-system failure. Prevention is the whole point."
+    },
+    {
+      "id": "EV026",
+      "tags": [
+        "third-party"
+      ],
+      "status": "OK",
+      "expected_category": "THIRD_PARTY_SERVICE",
+      "predicted_category": "PERFORMANCE_DEGRADATION",
+      "category_correct": false,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": true,
+      "expects_review": false,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.32,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001037,
+      "note": "Partial external degradation with a manual workaround."
+    },
+    {
+      "id": "EV027",
+      "tags": [
+        "support",
+        "noise"
+      ],
+      "status": "REJECTED",
+      "expected_category": "UNKNOWN",
+      "predicted_category": "UNKNOWN",
+      "category_correct": true,
+      "expected_priority": "UNKNOWN",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": true,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.0,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "INPUT_QUALITY"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0,
+      "note": "Should be rejected at input validation, never reaching the model."
+    },
+    {
+      "id": "EV028",
+      "tags": [
+        "adversarial",
+        "false-urgency"
+      ],
+      "status": "OK",
+      "expected_category": "USER_SUPPORT",
+      "predicted_category": "INFRASTRUCTURE_OUTAGE",
+      "category_correct": false,
+      "expected_priority": "P4_LOW",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.38,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001037,
+      "note": "Alarming opening, resolved single-user reality. Tests reading the whole report, not the first line."
+    },
+    {
+      "id": "EV029",
+      "tags": [
+        "access",
+        "security-adjacent"
+      ],
+      "status": "OK",
+      "expected_category": "ACCESS_REQUEST",
+      "predicted_category": "UNKNOWN",
+      "category_correct": false,
+      "expected_priority": "P3_MEDIUM",
+      "predicted_priority": "UNKNOWN",
+      "priority_correct": false,
+      "priority_distance": null,
+      "under_called": false,
+      "expects_review": true,
+      "routed_to_review": true,
+      "critical_miss": false,
+      "confidence": 0.15,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [
+        "LOW_CONFIDENCE",
+        "MODEL_ABSTAINED",
+        "INSUFFICIENT_INFORMATION"
+      ],
+      "latency_ms": 0,
+      "cost_usd": 0.0001031,
+      "note": "Privileged access without approval. Routine on its face, needs a human."
+    },
+    {
+      "id": "EV030",
+      "tags": [
+        "outage",
+        "partial"
+      ],
+      "status": "OK",
+      "expected_category": "APPLICATION_ERROR",
+      "predicted_category": "APPLICATION_ERROR",
+      "category_correct": true,
+      "expected_priority": "P2_HIGH",
+      "predicted_priority": "P3_MEDIUM",
+      "priority_correct": false,
+      "priority_distance": 1,
+      "under_called": true,
+      "expects_review": false,
+      "routed_to_review": false,
+      "critical_miss": true,
+      "confidence": 0.7,
+      "grounding_ratio": 1.0,
+      "hallucinated": false,
+      "review_reasons": [],
+      "latency_ms": 0,
+      "cost_usd": 0.000104,
+      "note": "Partial failure tied to a deployment; rollback is the obvious action."
+    }
+  ]
+}

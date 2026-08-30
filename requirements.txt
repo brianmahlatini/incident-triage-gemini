@@ -1,0 +1,14 @@
+# --- core workflow ---
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# --- Gemini (Developer API + Vertex AI use the same SDK) ---
+google-genai==2.20.0
+
+# --- serving layer for the React frontend ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# --- testing / evaluation ---
+pytest==8.3.4
+httpx==0.28.1
