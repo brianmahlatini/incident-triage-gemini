@@ -87,6 +87,25 @@ correctly went red, and it exposed a real bug: the API replied `retryDelay:
 fail. Fixed, and covered by tests. Details in
 [docs/EVALUATION.md](docs/EVALUATION.md).
 
+### Four bugs this found, and how
+
+Worth listing, because each was found by a different mechanism and none would
+have surfaced from reading the code:
+
+| Bug | Found by |
+|---|---|
+| `"request"` matched `"requests are failing"`, downgrading a P2 and auto-triaging it — a genuine critical miss | The evaluation harness, scoring critical misses separately |
+| The server's `retryDelay: 30s` hint ignored in favour of an 8s backoff cap, so every retry was guaranteed to fail | Running against a live rate limit |
+| Reasoning tokens consuming `max_output_tokens`, truncating the JSON mid-string | Running against a live model |
+| Taxonomy words counted as unsupported content, flagging a faithful summary as fabricated | Running one clean incident and reading the routing reasons |
+
+The last one is the most instructive. Nothing crashed and the output looked
+correct — it just quietly spent human review capacity on an incident that never
+needed it, while eroding the one signal that is supposed to mean the model
+invented something. **An over-eager safety check degrades into noise people
+learn to ignore**, which is a slower and more expensive failure than an
+obvious one.
+
 ---
 
 ## Architecture at a glance
@@ -191,7 +210,7 @@ PYTHONPATH=src python -m triage --samples
 # 2. One incident
 PYTHONPATH=src python -m triage --text "The claims portal is down for all 200 branch users since 09:00"
 
-# 3. Tests (99 backend, no network)
+# 3. Tests (101 backend, no network)
 pytest
 
 # 4. Evaluation harness
@@ -397,7 +416,7 @@ incident.
 
 ### Testing and evaluation — [`tests/`](tests/), [`eval/`](eval/)
 
-**115 tests, no network, all deterministic** — 99 backend (pytest) and 16
+**117 tests, no network, all deterministic** — 101 backend (pytest) and 16
 frontend (Vitest + Testing Library).
 
 The backend tests cover the schema contract, validation, redaction (including
@@ -467,7 +486,7 @@ src/triage/
   cli.py            command line entry point
 frontend/src/       React + TypeScript console, with tests beside components
 eval/               labelled dataset and evaluation harness
-tests/              99 backend tests
+tests/              101 backend tests
 docs/               architecture and evaluation write-ups
 Dockerfile          two-stage build: Node compiles the console, Python serves it
 cloudbuild.yaml     test -> evaluate -> build -> deploy to Cloud Run
