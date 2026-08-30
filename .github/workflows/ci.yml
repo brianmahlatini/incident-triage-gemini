@@ -1,0 +1,119 @@
+name: CI
+
+# cloudbuild.yaml is the deployment pipeline and is the right shape for GCP.
+# This workflow is the *visible* one: it runs on GitHub where the code lives,
+# so a reviewer can see at a glance whether the tests, the evaluation harness,
+# the frontend and the container build are all green.
+#
+# Nothing here needs credentials. Everything runs against the deterministic
+# offline provider, which is the reason that provider exists.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  backend:
+    name: Backend — lint, tests, evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: Lint
+        run: ruff check src eval tests --select F,E9
+
+      - name: Tests
+        run: pytest -q
+
+      # The absolute release gates are calibrated for the deployed model, and
+      # the offline baseline is not expected to clear them - gating CI on those
+      # would leave the build permanently red and the signal permanently
+      # ignored. Instead the baseline is compared against its own recorded
+      # result, which catches a real regression in the pipeline.
+      - name: Evaluation — regression check
+        run: python eval/run_eval.py --compare eval/results/mock-baseline.json
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: eval/results/
+          retention-days: 14
+
+  frontend:
+    name: Frontend — tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # `npm ci` installs exactly what the lockfile pins and fails if the
+      # lockfile and manifest disagree, which `npm install` would silently fix.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Tests
+        run: npm test
+
+      # Type-checks as well as bundles, via `tsc -b && vite build`.
+      - name: Build
+        run: npm run build
+
+  container:
+    name: Container — build and smoke test
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t incident-triage:ci .
+
+      # Building an image proves it compiles. Starting it and triaging a real
+      # incident through the HTTP surface proves it actually works - which is a
+      # different claim, and the one that matters. This is also what catches a
+      # container that binds the wrong port or cannot find its static files.
+      - name: Smoke test
+        run: |
+          docker run -d --name triage -p 8000:8080 incident-triage:ci
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/api/health > /dev/null; then break; fi
+            sleep 2
+          done
+          curl -sf http://localhost:8000/api/health | tee /dev/stderr | grep -q '"status":"ok"'
+          curl -sf -o /dev/null -w '%{http_code}' http://localhost:8000/ | grep -q 200
+          curl -sf -X POST http://localhost:8000/api/triage \
+            -H 'Content-Type: application/json' \
+            -d '{"text":"The claims portal is down for all 200 branch users since 09:00."}' \
+            | tee /dev/stderr | grep -q '"status":"OK"'
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs triage
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f triage || true

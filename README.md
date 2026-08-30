@@ -1,5 +1,8 @@
 # Incident Triage with Gemini
 
+[![CI](https://github.com/brianmahlatini/incident-triage-gemini/actions/workflows/ci.yml/badge.svg)](https://github.com/brianmahlatini/incident-triage-gemini/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A proof of concept that takes an unstructured operational incident report and
 returns a validated, structured triage record — category, summary, priority,
 recommended next action, and an explicit decision about whether a human needs to
@@ -87,11 +90,14 @@ PYTHONPATH=src python -m triage --samples
 # 2. One incident
 PYTHONPATH=src python -m triage --text "The claims portal is down for all 200 branch users since 09:00"
 
-# 3. Tests (99, no network)
+# 3. Tests (99 backend, no network)
 pytest
 
 # 4. Evaluation harness
 python eval/run_eval.py --verbose
+
+# 5. Frontend tests (16)
+cd frontend && npm install && npm test
 ```
 
 ### The web console
@@ -290,17 +296,45 @@ incident.
 
 ### Testing and evaluation — [`tests/`](tests/), [`eval/`](eval/)
 
-99 tests, no network, all deterministic. They cover the schema contract,
-validation, redaction (including what must *survive* it), grounding, every
-routing rule, the full retry matrix including the server retry hint, and the
-HTTP surface including the review loop.
+**115 tests, no network, all deterministic** — 99 backend (pytest) and 16
+frontend (Vitest + Testing Library).
+
+The backend tests cover the schema contract, validation, redaction (including
+what must *survive* it), grounding, every routing rule, the full retry matrix
+including the server retry hint, and the HTTP surface including the review
+loop. The frontend tests cover the things that would actually mislead an
+operator: that a flagged incident never renders as auto-triaged, that a
+fabricated evidence span is visually distinct from a grounded one, that
+redaction counts are surfaced, and that a dead backend produces a readable
+message rather than a blank panel.
 
 The evaluation harness (`eval/run_eval.py`) scores 30 labelled incidents on
 accuracy, priority *distance*, critical misses, hallucination rate, deferral
-precision/recall, automation rate and calibration, with **release gates that
-exit non-zero** so it runs in CI. `--limit` keeps a run inside a free-tier
-quota. See [docs/EVALUATION.md](docs/EVALUATION.md) for the reasoning behind
-each measure.
+precision/recall, automation rate and calibration. It has **two exit-code
+modes**, which is a deliberate distinction:
+
+- **Absolute gates** (default) answer *"is this good enough to deploy?"* They
+  are calibrated for the deployed model, and the offline baseline is not
+  expected to clear them.
+- **Regression check** (`--compare`) answers *"did this change make things
+  worse?"* by comparing a run against a recorded one. This is what CI runs.
+  Gating CI on the absolute gates would leave the build permanently red and
+  the signal permanently ignored; comparing the baseline against its own
+  recorded numbers catches a genuine pipeline regression without pretending a
+  keyword engine is shippable.
+
+`--limit` keeps a run inside a free-tier quota. See
+[docs/EVALUATION.md](docs/EVALUATION.md) for the reasoning behind each measure.
+
+### CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and
+pull request, needs no credentials, and has three jobs: **backend** (lint,
+tests, evaluation regression check), **frontend** (tests, type-check, build),
+and **container** — which builds the image, starts it, and triages a real
+incident through the HTTP surface. Building an image proves it compiles;
+starting it and getting a valid triage record back proves it works, which is a
+different claim and the one that matters.
 
 ---
 
@@ -330,12 +364,13 @@ src/triage/
   providers/        Provider interface, Gemini client, deterministic mock
   api.py            FastAPI surface including the review loop
   cli.py            command line entry point
-frontend/src/       React + TypeScript console
+frontend/src/       React + TypeScript console, with tests beside components
 eval/               labelled dataset and evaluation harness
-tests/              99 tests
+tests/              99 backend tests
 docs/               architecture and evaluation write-ups
 Dockerfile          two-stage build: Node compiles the console, Python serves it
 cloudbuild.yaml     test -> evaluate -> build -> deploy to Cloud Run
+.github/workflows/  CI: backend, frontend, and a container smoke test
 ```
 
 ---
@@ -363,3 +398,9 @@ cloudbuild.yaml     test -> evaluate -> build -> deploy to Cloud Run
 - **No retrieval over past incidents.** Grounding "recommended next action" in
   what actually resolved a similar incident before would likely be worth more
   than any further prompt tuning. It is the first thing I would build next.
+- **The concurrency figure is reasoned, not measured.** Cloud Run concurrency
+  40 follows from the work being IO-bound on the model call, but nothing here
+  has been load-tested, and I would not defend the number without doing so.
+- **The evaluation labels are my own.** No second annotator, so
+  inter-annotator agreement is unmeasured — which means there is no established
+  ceiling to judge the model against.

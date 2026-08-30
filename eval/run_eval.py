@@ -233,6 +233,38 @@ def evaluate(cases: list[dict[str, Any]], pipeline: TriagePipeline) -> dict[str,
     }
 
 
+# Tolerances for a regression check against a recorded run. The absolute gates
+# above answer "is this good enough to deploy?"; these answer a different and
+# equally important question - "did this change make things worse?" The offline
+# baseline is never expected to clear production gates, so gating CI on them
+# would leave the build permanently red and the signal permanently ignored.
+# Comparing the baseline against its own recorded numbers catches a genuine
+# regression in the pipeline without pretending a keyword engine is shippable.
+REGRESSION_TOLERANCES: dict[str, tuple[str, float]] = {
+    "category_accuracy": (">=", 0.05),        # may not drop more than 5pp
+    "priority_mean_distance": ("<=", 0.10),   # may not worsen by 0.1 bands
+    "critical_misses": ("<=", 0),             # may not increase at all
+    "severe_priority_errors": ("<=", 0),
+    "hallucination_rate": ("<=", 0.02),
+    "deferral_recall": (">=", 0.05),
+}
+
+
+def check_regression(metrics: dict[str, Any], baseline: dict[str, Any]) -> list[str]:
+    """Compare a run against a recorded one and report material regressions."""
+    failures = []
+    for name, (direction, tolerance) in REGRESSION_TOLERANCES.items():
+        current = metrics.get(name)
+        previous = baseline.get(name)
+        if current is None or previous is None:
+            continue
+        if direction == ">=" and current < previous - tolerance:
+            failures.append(f"{name} regressed: {previous} -> {current} (tolerance {tolerance})")
+        if direction == "<=" and current > previous + tolerance:
+            failures.append(f"{name} regressed: {previous} -> {current} (tolerance {tolerance})")
+    return failures
+
+
 def check_gates(metrics: dict[str, Any]) -> list[str]:
     failures = []
     for name, (operator, bound) in GATES.items():
@@ -348,6 +380,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", type=Path, default=DATASET)
     parser.add_argument("--out", type=Path, help="Write the full JSON report here.")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of a report.")
+    parser.add_argument(
+        "--compare",
+        type=Path,
+        help=(
+            "Compare against a recorded report and fail on regression instead of "
+            "applying the absolute release gates. This is what CI runs: the offline "
+            "baseline is not expected to clear production gates, but it must not be "
+            "allowed to get quietly worse."
+        ),
+    )
     parser.add_argument("--verbose", action="store_true", help="Show notes on failing cases.")
     parser.add_argument(
         "--limit",
@@ -374,6 +416,19 @@ def main(argv: list[str] | None = None) -> int:
         args.out.parent.mkdir(parents=True, exist_ok=True)
         args.out.write_text(json.dumps(report, indent=2), encoding="utf-8")
         print(f" Full report written to {args.out}\n")
+
+    if args.compare:
+        baseline = json.loads(args.compare.read_text(encoding="utf-8"))["metrics"]
+        regressions = check_regression(report["metrics"], baseline)
+        if regressions:
+            print(f" REGRESSION vs {args.compare}:")
+            for failure in regressions:
+                print(f"   - {failure}")
+            print()
+            return 1
+        print(f" No regression against {args.compare}.")
+        print()
+        return 0
 
     return 1 if check_gates(report["metrics"]) else 0
 
