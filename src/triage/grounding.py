@@ -77,18 +77,46 @@ def check_grounding(evidence: list[str], source_text: str) -> GroundingReport:
     return report
 
 
+# Vocabulary a summary may legitimately use without it appearing in the report:
+# the taxonomy's own words, plus the framing verbs a summary naturally opens
+# with. These are drawn from a closed enum or from the act of summarising, so
+# their presence is never evidence of fabrication - and counting them was
+# producing false positives on faithful summaries. A summary reading "Reported
+# infrastructure outage: <verbatim first sentence>" scored 0.5 and was flagged,
+# despite every factual word coming straight from the source.
+_TAXONOMY_WORDS = frozenset(
+    """
+    infrastructure outage application error network connectivity security
+    incident data integrity performance degradation hardware failure third
+    party service access request user support unknown critical high medium low
+    priority reported reports affected affecting issue system systems
+    """.split()
+)
+
+
 def summary_is_supported(summary: str, source_text: str, threshold: float = 0.55) -> bool:
     """Weak check that the summary is drawn from the report.
 
     Summaries are legitimately abstractive, so this cannot be strict without
     firing constantly. It catches the blatant case - a summary describing an
-    incident sharing almost no vocabulary with the source - and nothing subtler.
-    Content words only, so shared filler does not carry the score.
+    incident that shares almost no vocabulary with the source - and nothing
+    subtler. Deliberately weak: its job is to catch a summary about a different
+    incident, not to police paraphrasing.
+
+    Only content words are scored, and taxonomy vocabulary is excluded, so the
+    ratio reflects whether the *facts* came from the report rather than whether
+    the model happened to name its own category.
     """
     normalised_summary = _normalise(summary)
     normalised_source = _normalise(source_text)
-    content_words = [word for word in normalised_summary.split() if len(word) > 4]
-    if not content_words:
+    content_words = [
+        word
+        for word in normalised_summary.split()
+        if len(word) > 4 and word not in _TAXONOMY_WORDS
+    ]
+    # Too few content words to judge. Scoring two or three words produces a
+    # ratio that swings on a single match, which is noise, not signal.
+    if len(content_words) < 3:
         return True
     source_tokens = set(normalised_source.split())
     overlap = sum(word in source_tokens for word in content_words) / len(content_words)

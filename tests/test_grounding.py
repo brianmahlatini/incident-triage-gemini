@@ -71,3 +71,24 @@ def test_summary_about_a_different_incident_is_unsupported():
     assert not summary_is_supported(
         "A ransomware infection encrypted several finance workstations overnight.", SOURCE
     )
+
+
+def test_summary_naming_its_own_category_is_not_drift():
+    """Regression: taxonomy vocabulary is not evidence of fabrication.
+
+    A summary reading "Reported infrastructure outage: <verbatim sentence>"
+    was scoring 0.5 and being flagged as drifting, because "reported",
+    "infrastructure" and "outage" counted against it despite every factual
+    word coming from the source. Category names come from a closed enum, not
+    from invention.
+    """
+    assert summary_is_supported(
+        "Reported infrastructure outage: The core policy database prod-db-01 "
+        "went offline at 06:14 this morning.",
+        SOURCE,
+    )
+
+
+def test_very_short_summary_is_not_judged():
+    """Two or three content words swing on a single match. That is noise."""
+    assert summary_is_supported("Database offline.", SOURCE)
